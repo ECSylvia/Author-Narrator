@@ -1,0 +1,12 @@
+[project]
+name = "author-narrator"
+version = "1.5.0"
+description = "An app to allow authors to create an Audiobook in their own voice"
+requires-python = ">=3.12"
+dependencies = [
+    "PySide6",
+    "elevenlabs",
+]
+
+[project.scripts]
+author-narrator = "src.main:main"

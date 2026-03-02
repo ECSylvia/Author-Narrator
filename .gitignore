@@ -1,0 +1,34 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Book / manuscript data (user content)
+big-papi-book/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Audio output (generated files)
+*.mp3
+*.wav
+
+# Settings with secrets
+.env
+
+# uv lock file (optional — remove this line if you want to pin deps)
+# uv.lock

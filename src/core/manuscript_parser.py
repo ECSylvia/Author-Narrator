@@ -61,28 +61,31 @@ class ManuscriptParser:
              
         return chapters
 
+    _HEADING_RE = re.compile(
+        r'^\s*(?:chapter\s+[\w\-]+|prologue|epilogue)(?:\s*[-–—:].+)?$',
+        re.IGNORECASE,
+    )
+
     @staticmethod
     def _parse_text(content):
-        # Heuristic: Look for "Chapter" at start of lines
         lines = content.split('\n')
         chapters = []
         current_title = "Beginning"
         current_content = []
         order = 1
-        
+
         for line in lines:
-            if re.match(r'^\s*chapter\s+\d+|^\s*chapter\s+[a-z]+', line, re.IGNORECASE):
-                 # Save previous
+            if ManuscriptParser._HEADING_RE.match(line):
                 if current_content:
                     chapters.append(Chapter(current_title, '\n'.join(current_content).strip(), order))
                     order += 1
                     current_content = []
-                
+
                 current_title = line.strip()
             else:
                 current_content.append(line)
-                
+
         if current_content:
-             chapters.append(Chapter(current_title, '\n'.join(current_content).strip(), order))
-             
+            chapters.append(Chapter(current_title, '\n'.join(current_content).strip(), order))
+
         return chapters
