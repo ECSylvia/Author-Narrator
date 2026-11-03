@@ -1,0 +1,15 @@
+name: Doxie Hub integration checks
+on:
+  push:
+    branches: ['feature/doxie-hub-integration-*']
+  pull_request:
+jobs:
+  hub-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-web.txt
+      - run: pytest -q tests/test_hub_integration.py
