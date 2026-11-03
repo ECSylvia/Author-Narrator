@@ -1,6 +1,7 @@
 """Author Narrator web integration stub. Not production authentication."""
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from src.core.manuscript_parser import ManuscriptParser
 from hub_integration.security import REQUIRED_ENTITLEMENT
 
 app = FastAPI(title="Author Narrator Hub Adapter", version="0.1.0")
@@ -24,3 +25,21 @@ def integration():
 def launch(payload: ProjectLaunchRequest):
     # A browser-supplied workspace or project ID is never proof of authorization.
     raise HTTPException(status_code=501, detail="Hub session and entitlement verification not yet connected")
+
+class ManuscriptPreviewRequest(BaseModel):
+    filename: str = Field(min_length=1, max_length=200)
+    content: str = Field(min_length=1, max_length=2_000_000)
+
+@app.post("/manuscripts/preview")
+def preview_manuscript(payload: ManuscriptPreviewRequest):
+    # Stateless text preview only. No file writes or customer project creation.
+    # Never accept arbitrary server-side file paths from browser requests.
+    ext = payload.filename.rsplit(".", 1)[-1].lower() if "." in payload.filename else ""
+    if ext not in ("md", "txt"):
+        raise HTTPException(status_code=415, detail="Only .md and .txt manuscripts are supported")
+    parser = ManuscriptParser._parse_markdown if ext == "md" else ManuscriptParser._parse_text
+    chapters = parser(payload.content)
+    return {"chapters": [
+        {"title": chapter.title, "order": chapter.order, "characters": len(chapter.content)}
+        for chapter in chapters
+    ], "count": len(chapters)}
