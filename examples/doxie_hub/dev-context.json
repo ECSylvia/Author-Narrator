@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "mode": "mock",
+  "identity": {
+    "issuer": "urn:doxie-hub:development",
+    "subject": "dev-author-001",
+    "email": "author@example.invalid",
+    "email_verified": false,
+    "auth_time": null,
+    "amr": [
+      "mock"
+    ],
+    "acr": null
+  },
+  "profile": {
+    "id": "dev-user-001",
+    "email": "author@example.invalid",
+    "display_name": "Development Author"
+  },
+  "workspace_id": "dev-workspace-001",
+  "settings": {
+    "theme": "system",
+    "notifications_enabled": true,
+    "reduced_motion": false
+  },
+  "entitlements": [
+    {
+      "workspace_id": "dev-workspace-001",
+      "app_slug": "author-narrator",
+      "status": "active"
+    }
+  ],
+  "projects": [
+    {
+      "id": "sample",
+      "workspace_id": "dev-workspace-001",
+      "app_slug": "author-narrator",
+      "name": "Development Audiobook"
+    }
+  ],
+  "application": {
+    "slug": "author-narrator",
+    "name": "Author Narrator",
+    "description": "Audiobook and voice production",
+    "launch_path": "/apps/author-narrator",
+    "entitlement": "author_narrator.access",
+    "enabled": true
+  }
+}
