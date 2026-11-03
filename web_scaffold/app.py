@@ -1,5 +1,7 @@
 """Author Narrator web integration stub. Not production authentication."""
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from pathlib import Path
 from pydantic import BaseModel, Field
 from src.core.manuscript_parser import ManuscriptParser
 from hub_integration.security import REQUIRED_ENTITLEMENT
@@ -43,3 +45,7 @@ def preview_manuscript(payload: ManuscriptPreviewRequest):
         {"title": chapter.title, "order": chapter.order, "characters": len(chapter.content)}
         for chapter in chapters
     ], "count": len(chapters)}
+
+@app.get("/studio", include_in_schema=False)
+def studio():
+    return FileResponse(Path(__file__).resolve().parent / "static" / "index.html")
