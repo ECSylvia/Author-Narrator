@@ -12,6 +12,8 @@ build/
 
 # Book / manuscript data (user content)
 big-papi-book/
+local_data/
+local-server*.log
 
 # OS files
 .DS_Store
