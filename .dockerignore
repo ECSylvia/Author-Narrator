@@ -1,0 +1,7 @@
+*
+!local_web.py
+!src/
+!src/core/
+!src/core/manuscript_parser.py
+!web/
+!web/**

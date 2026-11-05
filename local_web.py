@@ -1,5 +1,6 @@
 """Local Author-Narrator workspace. Run: python local_web.py."""
 import json
+import os
 import subprocess
 import sys
 import threading
@@ -12,7 +13,9 @@ from urllib.parse import urlparse
 from src.core.manuscript_parser import ManuscriptParser
 
 ROOT = Path(__file__).resolve().parent
-DATA = ROOT / 'local_data'
+DATA = Path(os.environ.get('NARRATOR_DATA_DIR', ROOT / 'local_data'))
+HOSTS = ('127.0.0.1:8765', 'localhost:8765', '127.0.0.1:5173', 'localhost:5173')
+HOSTS += tuple(filter(None, os.environ.get('NARRATOR_HUB_HOSTS', '').split(',')))
 SPEECH = r'''
 Add-Type -AssemblyName System.Speech
 $request = [Console]::In.ReadToEnd() | ConvertFrom-Json
@@ -31,6 +34,20 @@ try {
 
 
 def speech(request):
+    if sys.platform.startswith('linux'):
+        voices = ('en-us', 'en-gb')
+        if request.get('action') == 'voices':
+            return json.dumps(voices)
+        voice = request.get('voice') or voices[0]
+        if voice not in voices:
+            raise ValueError('Select an installed narration voice')
+        result = subprocess.run(
+            ['espeak-ng', '-v', voice, '-w', request['path'], '--stdin'],
+            input=request['text'], encoding='utf-8', capture_output=True, timeout=300,
+        )
+        if result.returncode:
+            raise RuntimeError('Linux narration failed')
+        return ''
     result = subprocess.run(
         ['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', SPEECH],
         input=json.dumps(request), capture_output=True, text=True, timeout=300,
@@ -43,8 +60,7 @@ def speech(request):
 
 class Handler(BaseHTTPRequestHandler):
     def valid_host(self):
-        return self.headers.get('Host') in ('127.0.0.1:8765', 'localhost:8765',
-                                                   '127.0.0.1:5173', 'localhost:5173')
+        return self.headers.get('Host') in HOSTS
 
     def send(self, value, status=200, mime='application/json'):
         body = json.dumps(value).encode() if mime == 'application/json' else value
@@ -128,7 +144,7 @@ class LocalServer(ThreadingHTTPServer):
 
 
 if __name__ == '__main__':
-    server = LocalServer(('127.0.0.1', 8765), Handler)
+    server = LocalServer((os.environ.get('NARRATOR_BIND', '127.0.0.1'), 8765), Handler)
     print('Author-Narrator 2.0: http://127.0.0.1:8765', flush=True)
     if '--open' in sys.argv:
         threading.Timer(1, lambda: webbrowser.open('http://127.0.0.1:8765')).start()
