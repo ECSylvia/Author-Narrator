@@ -25,9 +25,12 @@ init();
 const brandTitle = document.querySelector('.brand-title');
 const brandTagline = document.querySelector('.brand small');
 const fitBrandTitle = () => {
-    const titleWidth = brandTitle.offsetWidth;
-    if (titleWidth) {
-        brandTitle.style.transform = `scaleX(${brandTagline.offsetWidth / titleWidth})`;
+    brandTitle.style.fontSize = '';
+    const titleWidth = brandTitle.getBoundingClientRect().width;
+    const taglineWidth = brandTagline.getBoundingClientRect().width;
+    if (titleWidth && taglineWidth) {
+        const baseSize = parseFloat(getComputedStyle(brandTitle).fontSize);
+        brandTitle.style.fontSize = `${baseSize * taglineWidth / titleWidth}px`;
     }
 };
 new ResizeObserver(fitBrandTitle).observe(brandTagline);
