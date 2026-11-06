@@ -21,3 +21,15 @@ $('approve').onclick=()=>{if(!current().audio){$('message').textContent='Generat
 $('export').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(project,null,2)],{type:'application/json'}));a.href=url;a.download=(project.name||'author-narrator')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 async function init(){render();try{const saved=await api('project');if(saved?.chapters?.length){project=saved;render()}}catch(e){$('message').textContent='Could not load the saved project: '+e.message}try{const result=await api('voices');for(const name of result.voices){const o=document.createElement('option');o.value=o.textContent=name;$('voice').append(o)}}catch(e){$('message').textContent=e.message}}
 init();
+
+const brandTitle = document.querySelector('.brand-title');
+const brandTagline = document.querySelector('.brand small');
+const fitBrandTitle = () => {
+    const titleWidth = brandTitle.offsetWidth;
+    if (titleWidth) {
+        brandTitle.style.transform = `scaleX(${brandTagline.offsetWidth / titleWidth})`;
+    }
+};
+new ResizeObserver(fitBrandTitle).observe(brandTagline);
+document.fonts.ready.then(fitBrandTitle);
+fitBrandTitle();
